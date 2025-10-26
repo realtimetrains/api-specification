@@ -1,0 +1,538 @@
+openapi: 3.1.1
+info:
+  title: Realtime Trains API (draft)
+  version: "2.0"
+  description: |
+    This API interrogates the Realtime Trains service for information about train services operating within Great Britain.
+
+    **The documentation is still in draft and is not yet implemented, and is available purely for discussion.**
+
+    Authentication is currently TBD but will likely be through bearer token authentication only.
+
+    [GitHub Repository and Contributing/Change Requests can be made here.](https://github.com/realtimetrains/api-specification)
+  contact:
+    email: hello@realtimetrains.com
+    url: http://www.realtimetrains.co.uk
+    name: Realtime Trains
+  summary: |
+    This is a draft version of the next generation of the Realtime Trains API, provided primarily for review and discussion prior to later implementation.
+  termsOfService: https://www.realtimetrains.co.uk/legal/
+
+tags:
+  - name: realtime
+    description: |
+      Is the primary entry point for generic outputs relating to service data, including forward looking schedule and historical outputs. 
+
+      Endpoints and outputs may be restricted by authorisation token.
+  - name: referenceData
+    description: |
+      Contains all referential data required for finding services.
+
+components:
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+
+  schemas:
+    SystemStatus:
+      type: object 
+      properties:
+        realtimeNetworkRail:
+          type: string
+          enum:
+            - "OK"
+            - "REALTIME_DATA_LIMITED"
+            - "REALTIME_DATA_NONE"
+          default: "OK"
+          description: |
+            Shows the current status of the real-time data ingress in the Network Rail ingesters 
+        rttCore:
+          type: string 
+          enum:
+            - "OK"
+            - "REALTIME_DEGRADED"
+            - "SCHEDULE_ONLY"
+          default: "OK"
+          description: |
+            Shows the current state of the RTT core and reflects the state of the responses being provided within this query
+
+    GeographicLocation:
+      type: object 
+      properties:
+        namespace:
+          type: string 
+          description: Namespace of the location
+          default: gb-nr 
+        description:
+          type: string 
+          description: Long text description of the location
+          example: Clapham Junction 
+        shortCodes:
+          type: array
+          items:
+            type: string 
+            example: CLJ 
+        longCodes:
+          type: array 
+          items:
+            type: string 
+            example: CLPHMJN
+          example:
+            - CLPHMJN
+            - CLPHMJ2
+            - CLPHMJM
+            - CLPHMJW
+            - CLPHMJC
+
+    StandardisedDateTime:
+      type: string 
+      format: date-time
+      description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:00Z"; UTC or with offset allowed)
+
+    LocationCallType:
+      oneOf:
+        - type: string 
+        - type: 'null'
+      description: Describes the nature of the location call type, if null then no call/stop is planned 
+      enum:
+        - OPERATIONAL_ONLY
+        - ADVERTISED_OPEN
+        - ADVERTISED_SET_DOWN
+        - ADVERTISED_PICK_UP
+      example: ADVERTISED_OPEN
+
+    LocationDisplayAs:
+      oneOf:
+        - type: string 
+        - type: 'null'
+      description: | 
+        Defines the display type for this location. The defined are as follows:
+
+        * **CALL**: train stops at location, specific nature defined in other fields 
+        * **CANCELLED**: train no longer stops at/passes this location, if it was previously a call it is undefined whether the train will no longer pass through (i.e. whether it is a Not to Stop order, or the train has been altered in such a way that it will not go through this location.) 
+        * **DIVERTED**: train has been diverted away from this route and will no longer pass through or call at this location.
+        * **STARTS**: train starts from this location (scheduled or altered to do so.)
+        * **TERMINATES**: train terminates at this location (scheduled or altered to do so.)
+
+        If this field is null, then the train is passing this location.
+      enum:
+        - CALL 
+        - CANCELLED
+        - DIVERTED
+        - STARTS 
+        - TERMINATES
+
+
+    IndividualTemporalData:
+      type: object 
+      properties:
+        scheduleInternal:
+          $ref: '#/components/schemas/StandardisedDateTime'
+          description: Where available, contains the internal time for this activity. In Network Rail, this is the WTT time.
+        scheduleAdvertised:
+          $ref: '#/components/schemas/StandardisedDateTime'
+          description: Where available, contains the advertised time for this activity. In Network Rail, this is the GBTT time.
+        realtimeForecast:
+          $ref: '#/components/schemas/StandardisedDateTime'
+          description: If populated, contains the forecasted time for this activity.
+        realtimeActual:
+          $ref: '#/components/schemas/StandardisedDateTime'
+          description: If populated, contains the actual time for this activity.
+        realtimeInternalLateness:
+          type: integer 
+          description: Lateness in minutes, *this field will be null if realtimeActual or scheduleInternal is not populated*
+          example: 5
+        realtimeAdvertisedLateness:
+          type: integer 
+          description: Lateness in minutes, *this field will be null if realtimeActual or scheduleAdvertised is not populated*
+        
+    LocationTemporalData:
+      type: object 
+      properties:
+        arrival:
+          $ref: '#/components/schemas/IndividualTemporalData'
+        departure:
+          $ref: '#/components/schemas/IndividualTemporalData' 
+        pass:
+          $ref: '#/components/schemas/IndividualTemporalData'
+        scheduledCallType:
+          $ref: '#/components/schemas/LocationCallType'
+        realtimeCallType:
+          $ref: '#/components/schemas/LocationCallType'
+        displayAs:
+          $ref: '#/components/schemas/LocationDisplayAs'
+
+
+    PlannedActualData:
+      type: object 
+      properties:
+        planned:
+          type: string 
+          example: 1
+          description: The planned value of this field
+        forecast:
+          description: The forecasted value of this field, not currently used
+          type: string 
+          example: null
+        actual: 
+          description: The actual value of this field.
+          type: string 
+          example: 2
+
+    LocationMetadata:
+      type: object
+      properties:
+        platform:
+          $ref: '#/components/schemas/PlannedActualData' 
+          description: Platform information for this location
+        line:
+          $ref: '#/components/schemas/PlannedActualData' 
+          description: Line information for this location (line is *where the service is next going*)
+        path: 
+          $ref: '#/components/schemas/PlannedActualData' 
+          description: Path information for this location (path is *where the service is coming from*)
+        numberOfVehicles:
+          type: integer
+          description: The number of passenger vehicles on the train 
+        allocationIndex:
+          type: integer 
+          description: The allocation index relating to this train service
+
+    ScheduleMetadata:
+      type: object
+      properties:
+        uniqueIdentity:
+          type: string
+          description: Unique identifier for this train service on this day 
+          example: "gb-nr:L01525:2025-10-26"
+        namespace:
+          type: string 
+          description: The operating namespace of this service 
+          example: gb-nr 
+        identity:
+          type: string 
+          description: The operating identity of this service 
+          example: L01525
+        departureDate:
+          type: string
+          description: The departure date of this train service from its planned origin
+          format: date 
+          example: "2025-10-26"
+        operator:
+          type: object 
+          properties:
+            code:
+              type: string 
+              example: SW
+            name:
+              type: string 
+              example: South Western Railway 
+        modeType:
+          type: string 
+          description: Describes the form of transport that is being operated on this service 
+          enum:
+            - TRAIN 
+            - SHIP
+            - SCHEDULED_BUS
+            - REPLACEMENT_BUS 
+          example: TRAIN 
+        inPassengerService:
+          type: boolean 
+          description: Identifies whether the service is operating in passenger service 
+          example: true 
+        allocations:
+          type: object 
+          description: |
+            Contains allocation data.
+
+            Specification TBD.
+
+    LocationLineUpObject:
+      type: object 
+      properties:
+        temporalData:
+          $ref: '#/components/schemas/LocationTemporalData'
+        locationMetadata:
+          $ref: '#/components/schemas/LocationMetadata'
+        scheduleMetadata:
+          $ref: '#/components/schemas/ScheduleMetadata'
+        reasons:
+          $ref: '#/components/schemas/LocationReasonContainer'
+        origin:
+          type: array 
+          items: 
+            $ref: "#/components/schemas/GeographicLocation"
+        destination:
+          type: array 
+          items: 
+            $ref: "#/components/schemas/GeographicLocation"
+    
+    ReasonBlock:
+      type: object 
+      properties:
+        type:
+          type: string 
+          description: Defines the type of reason
+          enum: 
+            - DELAY
+            - CANCEL
+          example: DELAY
+        code: 
+          type: string 
+          description: This is the underlying reason code sourced from the providing system 
+          example: TB 
+        system:
+          type: string 
+          description: This is the providing system for this reason code 
+          example: TRUST 
+        shortText:
+          type: string 
+          description: Short, no more than 40 character, description of the cause of the delay 
+          example: TOC request
+        longText: 
+          anyOf:
+            - type: string 
+            - type: 'null'
+          description: |
+            Long description of the cause of the delay.
+
+            If null, they are the same as the shortText.
+          example: At the request of the train operator.
+
+    LocationReasonContainer:
+      anyOf:
+        - type: string 
+        - type: 'null'
+      type: array 
+      description: Lists the defined delay or cancellation reasons for a delay or cancellation of this service in the context of where this object is seen
+      items:
+        $ref: '#/components/schemas/ReasonBlock'
+    
+    ServiceLocations:
+      type: array 
+      items:
+        type: object 
+        properties:
+          temporalData:
+            $ref: '#/components/schemas/LocationTemporalData'
+          locationMetadata:
+            $ref: '#/components/schemas/LocationMetadata'
+          location: 
+            $ref: '#/components/schemas/GeographicLocation'
+
+security:
+  - BearerToken: []
+
+paths:
+  /rtt/location:
+    get:
+      tags:
+        - realtime
+      summary: Generic location line-up for all namespaces
+      description: Searches for train services at a location level, returns train services listing data at that specific location. Generic for all namespaces.
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string 
+          required: true 
+          description: Any short or long code of the location being queried
+          example: CLPHMJN
+        - in: query 
+          name: namespace
+          schema:
+            type: string 
+            default: "gb-nr"
+            example: "gb-nr"
+          required: false
+          description: The namespace of the location being queried. Namespaces may be restricted by authorisation token. 
+        - in: query 
+          name: timeFrom
+          schema:
+            type: string 
+            format: date-time
+            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            example: "2025-10-25T13:45:30Z"
+          required: false 
+          description: |
+            The starting time window for the requested query, if timeTo is not defined then a 60 minute window by default is defined. 
+
+            If not defined, defaults to the current time.
+          example: "2025-10-25T13:00:00"
+        - in: query
+          name: timeTo
+          schema:
+            type: string 
+            format: date-time
+            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            example: "2025-10-25T13:45:30Z"
+          required: false 
+          description: |
+            The end of the time window for the requested query, if this is not defined then end is assumed to be 60 minutes later than timeFrom.
+
+            **The maximum query duration is 23 hours 59 minutes.**
+
+            Time window functionality may be limited by your authorisation token.
+
+            **May not be used with timeWindow.**
+          example: "2025-10-25T14:30:00"
+        - in: query 
+          name: timeWindow
+          schema:
+            type: integer
+            default: 60
+          required: false
+          description: |
+            If set true, this changes the default time window from 60 minutes to this value, and will set the timeTo value based on a fixed increase from timeFrom.
+
+            **May not be used with timeTo.**
+
+            Time window functionality may be limited by your authorisation token.
+          example: 120
+        - in: query
+          name: timeTolerance
+          schema:
+            type: boolean
+            default: false
+          example: false 
+          required: false 
+          description:
+            If set to true, this adjusts the time_from value slightly earlier based on the time window time in minutes. 
+
+            Time window functionality may be limited by your authorisation token.
+        - in: query 
+          name: detailed 
+          schema:
+            type: boolean 
+            default: false
+          example: false 
+          required: false 
+          description: |
+            If set to true, enables detailed mode when available in the namespace. Will also enable internal times to be displayed.
+
+            This functionality may be limited by your authorisation token.
+      responses:
+        '200':
+          description: Valid query, services found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object
+                    properties:
+                      location: 
+                        $ref: '#/components/schemas/GeographicLocation'
+                      time_from: 
+                        $ref: '#/components/schemas/StandardisedDateTime'
+                      time_to:
+                        $ref: '#/components/schemas/StandardisedDateTime'
+                  services:
+                    type: array 
+                    items:
+                      $ref: '#/components/schemas/LocationLineUpObject'
+        '204':
+          description: Valid query, no services found
+        '400':
+          description: Invalid query
+  /rtt/service:
+    get:
+      tags:
+        - realtime
+      summary: Generic service query for all namespaces
+      description: Searches for a requested train service, returning a generic data set suitable for all namespaces
+      parameters:
+        - in: query
+          name: uniqueIdentity
+          schema:
+            type: string 
+          required: false 
+          description: |
+            The unique identifier of a train service, which includes namespace, identity and departure date from origin.
+
+            **Required if _namespace_, _identity_ and _departureDate_ not set.**
+          example: gb-nr:L01525:2025-10-26
+        - in: query 
+          name: namespace
+          schema:
+            type: string 
+            default: "gb-nr"
+          example: "gb-nr"
+          required: false
+          description: |
+            The namespace of the service being queried.
+
+            **Required if _uniqueIdentity_ not set.**
+        - in: query 
+          name: identity
+          schema:
+            type: string 
+          example: L01525
+          required: false
+          description: |
+            The identity of the service being queried.
+
+            **Required if _uniqueIdentity_ not set.**
+        - in: query 
+          name: departureDate
+          schema:
+            type: string 
+            format: date
+          example: "2025-10-26"
+          required: false
+          description: |
+            The identity of the service being queried.
+
+            **Required if _uniqueIdentity_ not set.**
+      responses:
+        '200':
+          description: Returns the data for a service
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object 
+                  service:
+                    type: object 
+                    properties:
+                      scheduleMetadata:
+                        $ref: '#/components/schemas/ScheduleMetadata'
+                      locations:
+                        $ref: '#/components/schemas/ServiceLocations'
+                      origin:
+                        type: array 
+                        items: 
+                          $ref: "#/components/schemas/GeographicLocation"
+                      destination:
+                        type: array 
+                        items: 
+                          $ref: "#/components/schemas/GeographicLocation"
+        '404':
+          description: Service cannot be found
+  
+  /data/locations:
+    get:
+      tags:
+        - referenceData
+      summary: Get a list of locations available in the database
+      description: Gets a full list of locations from the database across all namespaces.
+      responses:
+        '200':
+          description: A list of all locations 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array 
+                    items:
+                      $ref: "#/components/schemas/GeographicLocation"
