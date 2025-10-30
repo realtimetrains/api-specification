@@ -427,9 +427,9 @@ paths:
                     properties:
                       location: 
                         $ref: '#/components/schemas/GeographicLocation'
-                      time_from: 
+                      timeFrom: 
                         $ref: '#/components/schemas/StandardisedDateTime'
-                      time_to:
+                      timeTo:
                         $ref: '#/components/schemas/StandardisedDateTime'
                   services:
                     type: array 
