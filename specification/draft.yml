@@ -499,7 +499,13 @@ paths:
                   systemStatus:
                     $ref: '#/components/schemas/SystemStatus'
                   query:
-                    type: object 
+                    type: object
+                    properties:
+                      uniqueIdentity: 
+                        type: string 
+                        description: |
+                          The unique identifier of a train service, which includes namespace, identity and departure date from origin.
+                        example: gb-nr:L01525:2025-10-26
                   service:
                     type: object 
                     properties:
