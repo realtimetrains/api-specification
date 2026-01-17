@@ -209,70 +209,105 @@ components:
       properties:
         uniqueIdentity:
           type: string
-          description: Unique identifier for this train service on this day 
+          description: Unique identifier for this train service on this day
           example: "gb-nr:L01525:2025-10-26"
         namespace:
-          type: string 
-          description: The operating namespace of this service 
-          example: gb-nr 
+          type: string
+          description: The operating namespace of this service
+          example: gb-nr
         identity:
-          type: string 
-          description: The operating identity of this service 
+          type: string
+          description: The operating identity of this service
           example: L01525
         departureDate:
           type: string
           description: The departure date of this train service from its planned origin
-          format: date 
+          format: date
           example: "2025-10-26"
         operator:
-          type: object 
+          type: object
           properties:
             code:
-              type: string 
+              type: string
               example: SW
             name:
-              type: string 
-              example: South Western Railway 
+              type: string
+              example: South Western Railway
         modeType:
-          type: string 
-          description: Describes the form of transport that is being operated on this service 
+          type: string
+          description: Describes the form of transport that is being operated on this service
           enum:
-            - TRAIN 
+            - TRAIN
             - SHIP
             - SCHEDULED_BUS
-            - REPLACEMENT_BUS 
-          example: TRAIN 
+            - REPLACEMENT_BUS
+          example: TRAIN
         inPassengerService:
-          type: boolean 
-          description: Identifies whether the service is operating in passenger service 
-          example: true 
+          type: boolean
+          description: Identifies whether the service is operating in passenger service
+          example: true
         allocations:
-          type: object 
+          type: object
           description: |
             Contains allocation data.
 
             Specification TBD.
 
-    LocationLineUpObject:
-      type: object 
+    NetworkRailScheduleMetadata:
+      allOf:
+        - $ref: '#/components/schemas/ScheduleMetadata'
+        - type: object
+          properties:
+            trainReportingIdentity:
+              type: string
+              description: The reporting identity of this service, commonly known as headcode
+              format: date
+              example: "1L40"
+
+    LocationLineUpBaseObject:
+      type: object
+      description: Base object for location line-up data shared across all namespaces
       properties:
         temporalData:
           $ref: '#/components/schemas/LocationTemporalData'
+          description: Arrival, departure, and pass timing information for this service at this location
         locationMetadata:
           $ref: '#/components/schemas/LocationMetadata'
-        scheduleMetadata:
-          $ref: '#/components/schemas/ScheduleMetadata'
+          description: Platform, line, path, and vehicle information for this location
         reasons:
           $ref: '#/components/schemas/LocationReasonContainer'
+          description: Delay or cancellation reasons applicable to this service at this location
         origin:
-          type: array 
-          items: 
+          type: array
+          description: The origin location(s) of this service
+          items:
             $ref: "#/components/schemas/GeographicLocation"
         destination:
-          type: array 
-          items: 
+          type: array
+          description: The destination location(s) of this service
+          items:
             $ref: "#/components/schemas/GeographicLocation"
-    
+
+    LocationLineUpObject:
+      description: Generic location line-up object suitable for all namespaces
+      allOf:
+        - $ref: '#/components/schemas/LocationLineUpBaseObject'
+        - type: object
+          properties:
+            scheduleMetadata:
+              $ref: '#/components/schemas/ScheduleMetadata'
+              description: Generic schedule metadata for this service
+
+    NetworkRailLocationLineUpObject:
+      description: Network Rail specific location line-up object with additional NR-specific fields
+      allOf:
+        - $ref: '#/components/schemas/LocationLineUpBaseObject'
+        - type: object
+          properties:
+            scheduleMetadata:
+              $ref: '#/components/schemas/NetworkRailScheduleMetadata'
+              description: Network Rail specific schedule metadata including train reporting identity (headcode)
+
     ReasonBlock:
       type: object 
       properties:
@@ -630,7 +665,7 @@ paths:
                   services:
                     type: array 
                     items:
-                      $ref: '#/components/schemas/LocationLineUpObject'
+                      $ref: '#/components/schemas/NetworkRailLocationLineUpObject'
         '204':
           description: Valid query, no services found
         '400':
@@ -696,7 +731,7 @@ paths:
                     type: object 
                     properties:
                       scheduleMetadata:
-                        $ref: '#/components/schemas/ScheduleMetadata'
+                        $ref: '#/components/schemas/NetworkRailScheduleMetadata'
                       locations:
                         $ref: '#/components/schemas/ServiceLocations'
                       origin:
