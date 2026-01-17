@@ -19,9 +19,14 @@ info:
   termsOfService: https://www.realtimetrains.co.uk/legal/
 
 tags:
-  - name: realtime
+  - name: generic
     description: |
       Is the primary entry point for generic outputs relating to service data, including forward looking schedule and historical outputs. 
+
+      Endpoints and outputs may be restricted by authorisation token.
+  - name: network-rail
+    description: |
+      Network Rail specific endpoints for service data. 
 
       Endpoints and outputs may be restricted by authorisation token.
   - name: referenceData
@@ -328,7 +333,7 @@ paths:
   /rtt/location:
     get:
       tags:
-        - realtime
+        - generic
       summary: Generic location line-up for all namespaces
       description: Searches for train services at a location level, returns train services listing data at that specific location. Generic for all namespaces.
       parameters:
@@ -442,7 +447,7 @@ paths:
   /rtt/service:
     get:
       tags:
-        - realtime
+        - generic
       summary: Generic service query for all namespaces
       description: Searches for a requested train service, returning a generic data set suitable for all namespaces
       parameters:
@@ -524,6 +529,188 @@ paths:
         '404':
           description: Service cannot be found
   
+  /gb-nr/location:
+    get:
+      tags:
+        - network-rail
+      summary: Network Rail specific location line-up for all namespaces
+      description: Searches for train services at a location level, returns train services listing data at that specific location.
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string 
+          required: true 
+          description: Any short or long code of the location being queried
+          example: CLPHMJN
+        - in: query 
+          name: timeFrom
+          schema:
+            type: string 
+            format: date-time
+            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            example: "2025-10-25T13:45:30Z"
+          required: false 
+          description: |
+            The starting time window for the requested query, if timeTo is not defined then a 60 minute window by default is defined. 
+
+            If not defined, defaults to the current time.
+          example: "2025-10-25T13:00:00"
+        - in: query
+          name: timeTo
+          schema:
+            type: string 
+            format: date-time
+            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            example: "2025-10-25T13:45:30Z"
+          required: false 
+          description: |
+            The end of the time window for the requested query, if this is not defined then end is assumed to be 60 minutes later than timeFrom.
+
+            **The maximum query duration is 23 hours 59 minutes.**
+
+            Time window functionality may be limited by your authorisation token.
+
+            **May not be used with timeWindow.**
+          example: "2025-10-25T14:30:00"
+        - in: query 
+          name: timeWindow
+          schema:
+            type: integer
+            default: 60
+          required: false
+          description: |
+            If set true, this changes the default time window from 60 minutes to this value, and will set the timeTo value based on a fixed increase from timeFrom.
+
+            **May not be used with timeTo.**
+
+            Time window functionality may be limited by your authorisation token.
+          example: 120
+        - in: query
+          name: timeTolerance
+          schema:
+            type: boolean
+            default: false
+          example: false 
+          required: false 
+          description:
+            If set to true, this adjusts the time_from value slightly earlier based on the time window time in minutes. 
+
+            Time window functionality may be limited by your authorisation token.
+        - in: query 
+          name: detailed 
+          schema:
+            type: boolean 
+            default: false
+          example: false 
+          required: false 
+          description: |
+            If set to true, enables detailed mode when available in the namespace. Will also enable internal times to be displayed.
+
+            This functionality may be limited by your authorisation token.
+      responses:
+        '200':
+          description: Valid query, services found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object
+                    properties:
+                      location: 
+                        $ref: '#/components/schemas/GeographicLocation'
+                      timeFrom: 
+                        $ref: '#/components/schemas/StandardisedDateTime'
+                      timeTo:
+                        $ref: '#/components/schemas/StandardisedDateTime'
+                  services:
+                    type: array 
+                    items:
+                      $ref: '#/components/schemas/LocationLineUpObject'
+        '204':
+          description: Valid query, no services found
+        '400':
+          description: Invalid query
+
+  /gb-nr/service:
+    get:
+      tags:
+        - network-rail
+      summary: Network Rail specific service query for all namespaces
+      description: Searches for a requested train service, returning with more specific Network Rail outputs.
+      parameters:
+        - in: query
+          name: uniqueIdentity
+          schema:
+            type: string 
+          required: false 
+          description: |
+            The unique identifier of a train service, which includes identity and departure date from origin.
+
+            **Required if _identity_ and _departureDate_ not set.**
+          example: gb-nr:L01525:2025-10-26
+        - in: query 
+          name: identity
+          schema:
+            type: string 
+          example: L01525
+          required: false
+          description: |
+            The identity of the service being queried.
+
+            **Required if _uniqueIdentity_ not set.**
+        - in: query 
+          name: departureDate
+          schema:
+            type: string 
+            format: date
+          example: "2025-10-26"
+          required: false
+          description: |
+            The identity of the service being queried.
+
+            **Required if _uniqueIdentity_ not set.**
+      responses:
+        '200':
+          description: Returns the data for a service
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object
+                    properties:
+                      uniqueIdentity: 
+                        type: string 
+                        description: |
+                          The unique identifier of a train service, which includes namespace, identity and departure date from origin.
+                        example: gb-nr:L01525:2025-10-26
+                  service:
+                    type: object 
+                    properties:
+                      scheduleMetadata:
+                        $ref: '#/components/schemas/ScheduleMetadata'
+                      locations:
+                        $ref: '#/components/schemas/ServiceLocations'
+                      origin:
+                        type: array 
+                        items: 
+                          $ref: "#/components/schemas/GeographicLocation"
+                      destination:
+                        type: array 
+                        items: 
+                          $ref: "#/components/schemas/GeographicLocation"
+        '404':
+          description: Service cannot be found
+
+
   /data/locations:
     get:
       tags:
