@@ -361,6 +361,85 @@ components:
           location: 
             $ref: '#/components/schemas/GeographicLocation'
 
+    NetworkRailAllocationItem:
+      type: object 
+      properties:
+        stockType:
+          type: string
+          enum:
+            - "UNIT"
+            - "LOCO"
+            - "WAGON"
+            - "CARRIAGE"
+            - "SET"
+          example: UNIT
+          description: Describes the type of allocation item being referred to. Note a loco, wagon and carriage describes a singular vehicle whereas a unit or set describes a number of vehicles.
+        identity:
+          type: string 
+          description: The TOPS number of the stockType as recorded in the rolling stock library, note that this may not be the same as the painted number 
+          example: 444045
+        inReverse:
+          type: boolean
+          description: Describes whether the unit is intended to be in reverse formation, defined by the source data. This is informative and the system has already reversed componentVehicles, if any.
+          example: false 
+        identitySuppressed:
+          type: boolean 
+          description: Indicates whether the identity has been deliberately suppressed.
+          example: false 
+        numberOfVehicles:
+          type: integer 
+          description: If present and greater than 0, describes the number of vehicles represented by this allocation item
+          example: 5
+        componentVehicles:
+          type: array
+          description: Indicates the component vehicles of this unit or set, if present.
+          items:
+            type: object 
+            properties:
+              identity:
+                type: string 
+                description: The TOPS number of this individual vehicle as recorded in the rolling stock library, note that this may not be the same as the painted number 
+                example: 63895
+              isPassengerVehicle:
+                type: boolean
+                description: Indicates whether this vehicle can carry passengers in seats.
+                example: true 
+              isLocomotive:
+                type: boolean
+                description: Indicates whether this vehicle is actually a locomotive. 
+                example: false 
+              index: 
+                type: integer 
+                description: Indicates the index position of this vehicle as provided from upstream. 
+                example: 0
+
+    NetworkRailAllocation: 
+      type: object 
+      properties:
+        allocationIndex:
+          type: integer
+          description: Allows you to connect this allocation object to the relevant location, on departure from that location
+          example: 0
+        leadingClass:
+          type: string
+          description: Describes the leading class of vehicle that can provide power
+          example: 444
+        passengerVehicles:
+          type: integer 
+          description: Number of vehicles in formation that can carry passengers 
+          example: 10 
+        allocationItems:
+          type: array 
+          items:
+            $ref: '#/components/schemas/NetworkRailAllocationItem'
+    
+    NetworkRailAllocationData:
+      type: array 
+      items:
+        $ref: '#/components/schemas/NetworkRailAllocation'
+
+        
+
 security:
   - BearerToken: []
 
@@ -734,6 +813,12 @@ paths:
                         $ref: '#/components/schemas/NetworkRailScheduleMetadata'
                       locations:
                         $ref: '#/components/schemas/ServiceLocations'
+                      allocationData:
+                        description: |
+                          Rolling stock allocation of this service, may or may not be populated.
+
+                          Various fields in this block may not be included, depending on your authentication token.
+                        $ref: '#/components/schemas/NetworkRailAllocationData'
                       origin:
                         type: array 
                         items: 
