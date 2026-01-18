@@ -913,4 +913,14 @@ paths:
                         null: true 
                         example: 14
                         default: 14 
+                      namespaceRestriction:
+                        type: boolean
+                        description: Indicates whether this API key is restricted to certain namespaces
+                        example: true 
+                      namespacesAvailable:
+                        type: array
+                        description: Lists the available namespaces to this API key if restricted 
+                        null: true 
+                        example:
+                          - gb-nr
                         
