@@ -167,7 +167,10 @@ components:
           $ref: '#/components/schemas/LocationCallType'
         displayAs:
           $ref: '#/components/schemas/LocationDisplayAs'
-
+        isInterpolated:
+          type: boolean
+          description: Indicates whether RTT has created this location in this schedule 
+          example: false
 
     PlannedActualData:
       type: object 
