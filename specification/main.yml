@@ -32,6 +32,9 @@ tags:
   - name: referenceData
     description: |
       Contains all referential data required for finding services.
+  - name: api
+    description: |
+      Contains state for API usage and operation
 
 components:
   securitySchemes:
@@ -872,3 +875,42 @@ paths:
                     type: array 
                     items:
                       $ref: "#/components/schemas/GeographicLocation"
+  
+  /api/info:
+    get:
+      tags:
+        - api 
+      summary: Get info on version and credentials
+      description: Provides information about the current API version and access credentials being used 
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  api_version:
+                    type: string 
+                    description: Provides the current version of the API being presented 
+                    example: 2026-01-18
+                  credentials:
+                    type: object 
+                    properties: 
+                      entitlements:
+                        type: array
+                        description: Lists the available entitlements to the currently in-use API key 
+                        example:
+                          - allowDetailed
+                          - allowAllocations 
+                      historyRestriction:
+                        type: boolean
+                        description: Indicates whether historical lookback restrictions are being placed on this API key 
+                        example: true 
+                      historyRestrictToDays:
+                        type: integer
+                        description: Indicates number of days that history is restricted to
+                        null: true 
+                        example: 14
+                        default: 14 
+                        
