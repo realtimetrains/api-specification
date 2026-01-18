@@ -457,15 +457,21 @@ paths:
             type: string 
           required: true 
           description: Any short or long code of the location being queried
-          example: CLPHMJN
-        - in: query 
-          name: namespace
+          example: gb-nr:CLPHMJN
+        - in: query
+          name: filterFrom
           schema:
             type: string 
-            default: "gb-nr"
-            example: "gb-nr"
           required: false
-          description: The namespace of the location being queried. Namespaces may be restricted by authorisation token. 
+          description: Any short or long code, filters by trains previously calling at location. If used, namespace must match code.
+          example: gb-nr:WAT
+        - in: query
+          name: filterTo
+          schema:
+            type: string 
+          required: false
+          description: Any short or long code, filters by trains subsequently calling at location. If used, namespace must match code.
+          example: gb-nr:WOK
         - in: query 
           name: timeFrom
           schema:
@@ -657,6 +663,20 @@ paths:
           required: true 
           description: Any short or long code of the location being queried
           example: CLPHMJN
+        - in: query
+          name: filterFrom
+          schema:
+            type: string 
+          required: false
+          description: Any short or long code, filters by trains previously calling at location
+          example: WAT
+        - in: query
+          name: filterTo
+          schema:
+            type: string 
+          required: false
+          description: Any short or long code, filters by trains subsequently calling at location
+          example: WOK
         - in: query 
           name: timeFrom
           schema:
