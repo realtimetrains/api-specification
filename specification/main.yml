@@ -1,23 +1,36 @@
 openapi: 3.1.1
 info:
-  title: Realtime Trains API (draft)
+  title: Realtime Trains API
   version: "2.0"
   description: |
     This API interrogates the Realtime Trains service for information about train services operating within Great Britain.
+
+    [GitHub Repository and Contributing/Change Requests can be made here.](https://github.com/realtimetrains/api-specification)
+
+    # Authentication 
 
     Authentication is made through a bearer token. You may *either* have:
     
     * solely an access token which grants you a long-life entitlement to the system or,
     * long-life refresh token which you will need to request a short-life access token with.
 
-    [GitHub Repository and Contributing/Change Requests can be made here.](https://github.com/realtimetrains/api-specification)
+    # API Versioning
+
+    You can find the current version of the API you are using through /api/info. The API accepts a Version header. You can guarantee the selection of the API version by using the Version header. You will otherwise always be provided the latest copy. 
+
   contact:
     email: hello@realtimetrains.com
     url: http://www.realtimetrains.co.uk
     name: Realtime Trains
   summary: |
-    This is a draft version of the next generation of the Realtime Trains API, provided primarily for review and discussion prior to later implementation.
+    This is the next generation of the Realtime Trains API, as currently implemented.
+
   termsOfService: https://www.realtimetrains.co.uk/legal/
+
+servers:
+  - url: https://data.rtt.io
+    description: Primary RTT API server
+  
 
 tags:
   - name: generic
@@ -507,6 +520,15 @@ components:
               coachLetter:
                 type: string 
                 description: Coach letter that should be displayed 
+    
+    EntitlementList:
+      type: array
+      description: Lists the available entitlements to the currently in-use API key 
+      example:
+        - allowDetailed
+        - allowAllocations 
+      items:
+        type: string 
         
 
 security:
@@ -970,11 +992,7 @@ paths:
                     type: object 
                     properties: 
                       entitlements:
-                        type: array
-                        description: Lists the available entitlements to the currently in-use API key 
-                        example:
-                          - allowDetailed
-                          - allowAllocations 
+                        $ref: '#/components/schemas/EntitlementList'
                       historyRestriction:
                         type: boolean
                         description: Indicates whether historical lookback restrictions are being placed on this API key 
@@ -995,4 +1013,29 @@ paths:
                         null: true 
                         example:
                           - gb-nr
+
+  /api/get_access_token:
+    get:
+      tags:
+        - api
+      summary: Provides an access token if the user only has a refresh token 
+      description: With a given refresh token provided as the bearer, the system returns a short life access token with the necessary entitlements
+      responses:
+        '200':
+          description: An access token
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  token:
+                    type: string 
+                    description: Access token for use against remaining API calls 
+                  entitlements:
+                    $ref: '#/components/schemas/EntitlementList'
+                  validUntil:
+                    type: string 
+                    format: date-time 
+                    description: Expiry time of this token 
+
                         
