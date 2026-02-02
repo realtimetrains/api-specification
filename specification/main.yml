@@ -5,9 +5,10 @@ info:
   description: |
     This API interrogates the Realtime Trains service for information about train services operating within Great Britain.
 
-    **The documentation is still in draft and is not yet implemented, and is available purely for discussion.**
-
-    Authentication is currently TBD but will likely be through bearer token authentication only.
+    Authentication is made through a bearer token. You may *either* have:
+    
+    * solely an access token which grants you a long-life entitlement to the system or,
+    * long-life refresh token which you will need to request a short-life access token with.
 
     [GitHub Repository and Contributing/Change Requests can be made here.](https://github.com/realtimetrains/api-specification)
   contact:
@@ -467,12 +468,45 @@ components:
           type: array 
           items:
             $ref: '#/components/schemas/NetworkRailAllocationItem'
-    
+        knowYourTrainData:
+          $ref: '#/components/schemas/NetworkRailKnowYourTrainData'
+
     NetworkRailAllocationData:
       type: array 
       items:
         $ref: '#/components/schemas/NetworkRailAllocation'
 
+    NetworkRailKnowYourTrainData:
+      type: object 
+      properties:
+        stockBranding:
+          type: string 
+          description: States the branding of the stock if relevant 
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowYourTrainDataGroup'
+
+    KnowYourTrainDataGroup:
+      type: object
+      properties:
+        identity:
+          type: string 
+          description: Populated if it should be displayed below the vehicle group. Identifies the vehicle/unit/set.
+        vehicles:
+          type: array 
+          items:
+            type: object
+            properties:
+              graphic:
+                type: string
+                description: Refers to the image graphic path to be displayed.+
+              isPassengerVehicle:
+                type: boolean 
+                description: Indicates whether this a passenger vehicle and if a coach 
+              coachLetter:
+                type: string 
+                description: Coach letter that should be displayed 
         
 
 security:
