@@ -241,10 +241,11 @@ components:
               example: South Western Railway
         modeType:
           type: string
-          description: Describes the form of transport that is being operated on this service
+          description: Describes the form of transport that is being operated on this service. Note that BUS is deprecated and will soon be removed; and is only in place until we can make some technical changes.
           enum:
             - TRAIN
             - SHIP
+            - BUS
             - SCHEDULED_BUS
             - REPLACEMENT_BUS
           example: TRAIN
