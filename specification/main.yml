@@ -176,6 +176,13 @@ components:
         realtimeAdvertisedLateness:
           type: integer 
           description: Lateness in minutes, *this field will be null if realtimeActual or scheduleAdvertised is not populated*
+        isCancelled: 
+          type: boolean
+          description: Identifies if this temporal element is cancelled
+        cancellationReasonCode:
+          type: string 
+          description: Provides a reason code for the cancellation reason 
+
         
     LocationTemporalData:
       type: object 
@@ -372,9 +379,6 @@ components:
           example: At the request of the train operator.
 
     LocationReasonContainer:
-      anyOf:
-        - type: string 
-        - type: 'null'
       type: array 
       description: Lists the defined delay or cancellation reasons for a delay or cancellation of this service in the context of where this object is seen
       items:
@@ -587,6 +591,8 @@ paths:
                         $ref: '#/components/schemas/StandardisedDateTime'
                       timeTo:
                         $ref: '#/components/schemas/StandardisedDateTime'
+                  reasons:
+                    $ref: '#/components/schemas/LocationReasonContainer'
                   services:
                     type: array 
                     items:
@@ -677,6 +683,9 @@ paths:
                         type: array 
                         items: 
                           $ref: "#/components/schemas/GeographicLocation"
+                      reasons:
+                        $ref: '#/components/schemas/LocationReasonContainer'
+
         '404':
           description: Service cannot be found
   
@@ -792,6 +801,8 @@ paths:
                         $ref: '#/components/schemas/StandardisedDateTime'
                       timeTo:
                         $ref: '#/components/schemas/StandardisedDateTime'
+                  reasons:
+                    $ref: '#/components/schemas/LocationReasonContainer'
                   services:
                     type: array 
                     items:
@@ -878,6 +889,8 @@ paths:
                         type: array 
                         items: 
                           $ref: "#/components/schemas/GeographicLocation"
+                      reasons:
+                        $ref: '#/components/schemas/LocationReasonContainer'
         '404':
           description: Service cannot be found
 
