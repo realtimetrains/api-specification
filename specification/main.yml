@@ -131,6 +131,28 @@ components:
         - STARTS 
         - TERMINATES
 
+    LocationStatus:
+      oneOf:
+        - type: string 
+        - type: 'null'
+      description: | 
+        Defines the location "status" of this location. They are defined as follows:
+
+        * **APPROACHING**: train is approaching the location
+        * **ARRIVING**: train is arriving at the platform
+        * **AT_PLATFORM**: train is stopped at the platform
+        * **DEPART_PREPARING**: train is preparing to depart 
+        * **DEPART_READY**: train is ready to depart (typically signal is "off")
+        * **DEPARTING**: train is leaving the Platform
+
+        Not all train services in all locations and/or systems will support all of the above values.
+      enum:
+        - APPROACHING 
+        - ARRIVING
+        - AT_PLATFORM
+        - DEPART_PREPARING 
+        - DEPART_READY
+        - DEPARTING
 
     IndividualTemporalData:
       type: object 
@@ -170,6 +192,8 @@ components:
           $ref: '#/components/schemas/LocationCallType'
         displayAs:
           $ref: '#/components/schemas/LocationDisplayAs'
+        status:
+          $ref: '#/components/schemas/LocationStatus'
         isInterpolated:
           type: boolean
           description: Indicates whether RTT has created this location in this schedule 
