@@ -357,6 +357,17 @@ components:
               description: The reporting identity of this service, commonly known as headcode
               format: date
               example: "1L40"
+            stpIndicator:
+              type: string
+              description: STP indicator for this service. Only available in detailed mode.
+              enum:
+                - WTT
+                - VAR
+                - STP
+                - CAN
+                - VST
+                - VVR
+                - VCN
 
     LocationLineUpBaseObject:
       type: object
