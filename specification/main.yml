@@ -265,6 +265,15 @@ components:
           type: integer 
           description: The allocation index relating to this train service
 
+    NetworkRailLocationMetadata:
+      allOf:
+        - $ref: '#/components/schemas/LocationMetadata'
+        - type: object
+          properties:
+            stockBranding:
+              type: string
+              description: States the branding of the stock if relevant
+
     ScheduleMetadata:
       type: object
       properties:
@@ -360,10 +369,20 @@ components:
               $ref: '#/components/schemas/ScheduleMetadata'
               description: Generic schedule metadata for this service
 
+    NetworkRailLocationLineUpBaseObject:
+      description: Base object for location line-up data with Network Rail specific fields
+      allOf:
+        - $ref: '#/components/schemas/LocationLineUpBaseObject'
+        - type: object
+          properties:
+            locationMetadata:
+              $ref: '#/components/schemas/NetworkRailLocationMetadata'
+              description: Platform, line, path, vehicle, and stock branding information for this location
+
     NetworkRailLocationLineUpObject:
       description: Network Rail specific location line-up object with additional NR-specific fields
       allOf:
-        - $ref: '#/components/schemas/LocationLineUpBaseObject'
+        - $ref: '#/components/schemas/NetworkRailLocationLineUpBaseObject'
         - type: object
           properties:
             scheduleMetadata:
