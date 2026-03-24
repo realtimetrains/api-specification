@@ -545,8 +545,13 @@ components:
       type: object 
       properties:
         stockBranding:
-          type: string 
-          description: States the branding of the stock if relevant 
+          type: string
+          description: States the branding of the stock if relevant
+        commonFacilities:
+          oneOf:
+            - $ref: '#/components/schemas/KnowYourTrainFacilityList'
+            - type: 'null'
+          description: Facilities common to all groups in the formation. May be null or not present.
         data:
           type: array
           items:
@@ -558,6 +563,11 @@ components:
         identity:
           type: string 
           description: Populated if it should be displayed below the vehicle group. Identifies the vehicle/unit/set.
+        groupFacilities:
+          oneOf:
+            - $ref: '#/components/schemas/KnowYourTrainFacilityList'
+            - type: 'null'
+          description: Facilities available to only this group. May be null or not present. 
         vehicles:
           type: array 
           items:
@@ -572,7 +582,24 @@ components:
               coachLetter:
                 type: string 
                 description: Coach letter that should be displayed 
+              individualFacilities:
+                oneOf:
+                  - $ref: '#/components/schemas/KnowYourTrainFacilityList'
+                  - type: 'null'
+                description: Facilities available to only this vehicle. May be null or not present. 
     
+    KnowYourTrainFacilityList:
+      type: array
+      description: |
+        A list of facilities available on the train. Values are not strictly defined but currently known values include:
+        wifi, bicycle, wheelchair, toilet, power, usb, buffet, quiet, baby-changing, aircon, luggage, sleeper, first, entertainment
+      items:
+        type: string
+      example:
+        - wifi
+        - power
+        - toilet
+
     EntitlementList:
       type: array
       description: Lists the available entitlements to the currently in-use API key 
