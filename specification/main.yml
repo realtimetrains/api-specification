@@ -262,8 +262,11 @@ components:
           type: integer
           description: The number of passenger vehicles on the train 
         allocationIndex:
-          type: integer 
+          type: integer
           description: The allocation index relating to this train service
+        isRequestStop:
+          type: boolean
+          description: Indicates whether this location is a request stop
 
     NetworkRailLocationMetadata:
       allOf:
