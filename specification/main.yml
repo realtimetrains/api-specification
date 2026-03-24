@@ -180,6 +180,16 @@ components:
         realtimeForecast:
           $ref: '#/components/schemas/StandardisedDateTime'
           description: If populated, contains the forecasted time for this activity.
+        realtimeEstimate:
+          $ref: '#/components/schemas/StandardisedDateTime'
+          description: | 
+            If populated, shows an estimated time for this activity if the service has otherwise not reported at this location.
+
+            This field is conditional based on entitlements. 
+        realtimeNoReport:
+          type: boolean
+          description: If populated true, this service has not reported at this activity.
+          example: false
         realtimeActual:
           $ref: '#/components/schemas/StandardisedDateTime'
           description: If populated, contains the actual time for this activity.
