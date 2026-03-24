@@ -928,6 +928,22 @@ paths:
             If set to true, enables detailed mode when available in the namespace. Will also enable internal times to be displayed.
 
             This functionality may be limited by your authorisation token.
+        - in: query
+          name: stpFilter
+          schema:
+            type: string
+            pattern: '^[WVSC]{1,4}$'
+          required: false
+          description: |
+            Filters services by STP indicator. A string of up to 4 characters, where each character represents an STP type:
+
+            * **W**: WTT (Working Timetable)
+            * **V**: VAR (Variation)
+            * **S**: STP (Short Term Plan)
+            * **C**: CAN (Cancellation)
+
+            Only works in detailed mode. May be limited by your authorisation token.
+          example: WVS
       responses:
         '200':
           description: Valid query, services found
@@ -941,16 +957,28 @@ paths:
                   query:
                     type: object
                     properties:
-                      location: 
+                      location:
                         $ref: '#/components/schemas/GeographicLocation'
-                      timeFrom: 
+                      timeFrom:
                         $ref: '#/components/schemas/StandardisedDateTime'
                       timeTo:
                         $ref: '#/components/schemas/StandardisedDateTime'
+                      stpFilter:
+                        type: object
+                        description: Reflects the STP filter applied to this query. Only present if stpFilter has been presented and it has been accepted.
+                        properties:
+                          WTT:
+                            type: boolean
+                          VAR:
+                            type: boolean
+                          STP:
+                            type: boolean
+                          CAN:
+                            type: boolean
                   reasons:
                     $ref: '#/components/schemas/LocationReasonContainer'
                   services:
-                    type: array 
+                    type: array
                     items:
                       $ref: '#/components/schemas/NetworkRailLocationLineUpObject'
         '204':
