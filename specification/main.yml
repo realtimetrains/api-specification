@@ -276,6 +276,26 @@ components:
             stockBranding:
               type: string
               description: States the branding of the stock if relevant
+            allowances:
+              type: object
+              description: |
+                Contains timing allowances for this location. This object is not guaranteed to be present on a location search (only on a service query). Individual values may be null if not applicable.
+              properties:
+                engineering:
+                  oneOf:
+                    - type: integer
+                    - type: 'null'
+                  description: Engineering allowance in seconds
+                pathing:
+                  oneOf:
+                    - type: integer
+                    - type: 'null'
+                  description: Pathing allowance in seconds
+                performance:
+                  oneOf:
+                    - type: integer
+                    - type: 'null'
+                  description: Performance allowance in seconds
 
     ScheduleMetadata:
       type: object
