@@ -1,8 +1,6 @@
 # Realtime Trains API draft specification
 
-This repository contains the draft specification for the next generation of the Realtime Trains API.
-
-**This specification is not final** and may contain details that are not implemented within the API.
+This repository contains the implemented specification for the next generation of the Realtime Trains API.
 
 [You can view a UI view of the specification here.](https://realtimetrains.github.io/api-specification/)
 
@@ -14,21 +12,49 @@ _Do not_ request changes through documentation changes via pull requests, these 
 
 ## Access Control
 
-We have recently launched the Realtime Trains unified login service. It is likely that we will migrate the API portal to use this service.
+API authentication is performed through a *Bearer* token authentication. You may either hold a long-life refresh or access token. When you are provided with the key, it will be made clear what you hold.
 
-The API itself will move from a *Basic* auth to a *Bearer* auth. We will issue access tokens from which you will need to request refresh tokens to access the API.
+**It is a requirement that no token is placed in a downstream user application unless specifically authorised by us.** If we identify a token is in a downstream user application, it **will** be revoked.
 
-The exact mechanisms are yet to be defined.
+End-user applications are expected to proxy their requests through a server-side application such that token is not available publicly.
+
+### Long-life Access Token
+
+If you hold a long-life access token, you do not need to refresh or update your token unless it reaches its expiry. You can request a new token by contacting the RTT Team at hello@realtimetrains.com.
+
+### Refresh Token
+
+If you have a refresh token, you will need to periodically request an access token. You can do this through the `/api/get_access_token` endpoint. This will issue you an access token that is valid until the time defined in `validUntil`. It will also tell you your entitlements.
+
+### Understanding your entitlements
+
+An access token does not grant access to all functionality of the API. Entitlements can restrict access to namespaces and/or functionality, such as access to detailed information or Know Your Train data.
+
+When you have a valid access token, your entitlements can be found through the `/api/info` endpoint. 
+
+## Getting an access token
+
+We have recently launched the Realtime Trains unified login service. We will soon be relaunching our API portal which will provide access tokens.
+
+More information will be provided when the API portal relaunches.
+
+For users with access to endpoints at https://secure.realtimetrains.co.uk, you will be contacted individually.
 
 ## Versioning
 
-We will release updates to the API frequently following initial implementation. 
+The API is updated frequently and is versioned such that you can fix yourself to a defined version.
 
-Versioning is currently TBC, but our current thoughts are to use a HTTP header to request versions, and a default version can be selected within the portal.
+You can request a specific version of the API by either:
+* sending a `Version` header in your HTTP request, or
+* sending a `version` GET parameter in your HTTP URI.
 
-## Transition
+If you do not send a version request, you will automatically receive the latest version of the API.
 
-When this API specification is finalised and we complete implementation work to deliver it, we will transition the v1 APIs as follows:
+You can find the version identifier you are currently using on the `version` property in the `/api/info` endpoint.
+
+## API Transition
+
+We will transition to the new API versions as follows:
 
 * https://api.rtt.io access will be kept available for at least 6 months
 * https://secure.realtimetrains.co.uk (supported API) as follows:
@@ -36,6 +62,8 @@ When this API specification is finalised and we complete implementation work to 
   * Commercial customers will be able to access this for 12 months
 
 If you are not sure what category you are under, contact us at hello@realtimetrains.com.
+
+We will advise EOL dates for each version of the API when we release the v2 API into production usage.
 
 ## Discussion
 
