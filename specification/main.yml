@@ -416,12 +416,12 @@ components:
           type: array
           description: The origin location(s) of this service
           items:
-            $ref: "#/components/schemas/GeographicLocation"
+            $ref: "#/components/schemas/LocationPair"
         destination:
           type: array
           description: The destination location(s) of this service
           items:
-            $ref: "#/components/schemas/GeographicLocation"
+            $ref: "#/components/schemas/LocationPair"
 
     LocationLineUpObject:
       description: Generic location line-up object suitable for all namespaces
@@ -514,6 +514,14 @@ components:
             $ref: '#/components/schemas/NetworkRailLocationMetadata'
           location:
             $ref: '#/components/schemas/GeographicLocation'
+
+    LocationPair:
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/GeographicLocation'
+        temporalData:
+          $ref: '#/components/schemas/IndividualTemporalData'
 
     NetworkRailAllocationItem:
       type: object 
@@ -868,19 +876,19 @@ paths:
                       locations:
                         $ref: '#/components/schemas/ServiceLocations'
                       origin:
-                        type: array 
-                        items: 
-                          $ref: "#/components/schemas/GeographicLocation"
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/LocationPair"
                       destination:
-                        type: array 
-                        items: 
-                          $ref: "#/components/schemas/GeographicLocation"
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/LocationPair"
                       reasons:
                         $ref: '#/components/schemas/LocationReasonContainer'
 
         '404':
           description: Service cannot be found
-  
+
   /gb-nr/location:
     get:
       tags:
@@ -1106,18 +1114,101 @@ paths:
                           Various fields in this block may not be included, depending on your authentication token.
                         $ref: '#/components/schemas/NetworkRailAllocationData'
                       origin:
-                        type: array 
-                        items: 
-                          $ref: "#/components/schemas/GeographicLocation"
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/LocationPair"
                       destination:
-                        type: array 
-                        items: 
-                          $ref: "#/components/schemas/GeographicLocation"
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/LocationPair"
                       reasons:
                         $ref: '#/components/schemas/LocationReasonContainer'
         '404':
           description: Service cannot be found
 
+  /gb-nr/allocations_by_service:
+    get:
+      tags:
+        - network-rail
+      summary: Allocation listing by service for a given TOC and date
+      description: |
+        Returns rolling stock allocation data listed by service for a given TOC and departure date.
+
+        Requires the `allowFullAllocationListing` entitlement. Access may be further restricted by TOC.
+      parameters:
+        - $ref: '#/components/parameters/VersionHeader'
+        - $ref: '#/components/parameters/VersionQuery'
+        - in: query
+          name: departureDate
+          schema:
+            type: string
+            format: date
+          required: true
+          description: Scheduled date of departure from origin
+          example: "2025-10-26"
+        - in: query
+          name: toc
+          schema:
+            type: string
+          required: true
+          description: Requested TOC filter
+          example: SW
+      responses:
+        '200':
+          description: Valid query, allocations found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object
+                    properties:
+                      departureDate:
+                        type: string
+                        format: date
+                        example: "2025-10-26"
+                      toc:
+                        type: string
+                        example: SW
+                  services:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduleMetadata:
+                          $ref: '#/components/schemas/NetworkRailScheduleMetadata'
+                        origin:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LocationPair'
+                        destination:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LocationPair'
+                        allocations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              attached:
+                                $ref: '#/components/schemas/LocationPair'
+                              detached:
+                                $ref: '#/components/schemas/LocationPair'
+                              allocationIndex:
+                                type: integer
+                                description: Index of this allocation, starting from 0
+                                example: 0
+                              allocationItems:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/NetworkRailAllocationItem'
+        '400':
+          description: Invalid query
+        '401':
+          description: Missing required entitlement or TOC access restricted
 
   /data/locations:
     get:
