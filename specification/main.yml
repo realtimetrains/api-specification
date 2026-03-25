@@ -462,15 +462,27 @@ components:
         $ref: '#/components/schemas/ReasonBlock'
     
     ServiceLocations:
-      type: array 
+      type: array
       items:
-        type: object 
+        type: object
         properties:
           temporalData:
             $ref: '#/components/schemas/LocationTemporalData'
           locationMetadata:
             $ref: '#/components/schemas/LocationMetadata'
-          location: 
+          location:
+            $ref: '#/components/schemas/GeographicLocation'
+
+    NetworkRailServiceLocations:
+      type: array
+      items:
+        type: object
+        properties:
+          temporalData:
+            $ref: '#/components/schemas/LocationTemporalData'
+          locationMetadata:
+            $ref: '#/components/schemas/NetworkRailLocationMetadata'
+          location:
             $ref: '#/components/schemas/GeographicLocation'
 
     NetworkRailAllocationItem:
@@ -1048,7 +1060,7 @@ paths:
                       scheduleMetadata:
                         $ref: '#/components/schemas/NetworkRailScheduleMetadata'
                       locations:
-                        $ref: '#/components/schemas/ServiceLocations'
+                        $ref: '#/components/schemas/NetworkRailServiceLocations'
                       allocationData:
                         description: |
                           Rolling stock allocation of this service, may or may not be populated.
