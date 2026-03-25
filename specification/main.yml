@@ -368,6 +368,10 @@ components:
                 - VST
                 - VVR
                 - VCN
+            runsAsRequired:
+              type: boolean
+              description: Indicates if this schedule is planned to run as required. Only available in detailed mode.
+              example: false
 
     LocationLineUpBaseObject:
       type: object
