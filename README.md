@@ -1,4 +1,4 @@
-# Realtime Trains API draft specification
+# Realtime Trains API specification
 
 This repository contains the implemented specification for the next generation of the Realtime Trains API.
 
@@ -14,9 +14,7 @@ _Do not_ request changes through documentation changes via pull requests, these 
 
 API authentication is performed through a *Bearer* token authentication. You may either hold a long-life refresh or access token. When you are provided with the key, it will be made clear what you hold.
 
-**It is a requirement that no token is placed in a downstream user application unless specifically authorised by us.** If we identify a token is in a downstream user application, it **will** be revoked.
-
-End-user applications are expected to proxy their requests through a server-side application such that token is not available publicly.
+**It is a requirement that no token is placed in a distributable user application unless specifically authorised by us.** End-user applications are expected to proxy their requests through a server-side application such that token is not available publicly. If we identify a token is in a downstream user application, it **will** be revoked.
 
 ### Long-life Access Token
 
@@ -34,9 +32,7 @@ When you have a valid access token, your entitlements can be found through the `
 
 ## Getting an access token
 
-We have recently launched the Realtime Trains unified login service. We will soon be relaunching our API portal which will provide access tokens.
-
-More information will be provided when the API portal relaunches.
+You can sign up to the next-generation API at https://api-portal.rtt.io. It requires a RTT unified login account.
 
 For users with access to endpoints at https://secure.realtimetrains.co.uk, you will be contacted individually.
 
@@ -54,16 +50,16 @@ You can find the version identifier you are currently using on the `version` pro
 
 ## API Transition
 
-We will transition to the new API versions as follows:
+All existing APIs are now deprecated following the release of the new API portal. No further updates will be made to the existing portals or services.
 
-* https://api.rtt.io access will be kept available for at least 6 months
-* https://secure.realtimetrains.co.uk (supported API) as follows:
-  * Users who access this at no cost will be able to access this for 9 months
-  * Commercial customers will be able to access this for 12 months
+### Deprecation and shut-down dates
+
+* https://api.rtt.io (the original portal) will be turned off on 31 September 2026
+* https://secure.realtimetrains.co.uk (supported API) will be turned off on:
+  * No cost access: 31 December 2026
+  * Commercial access: 31 March 2027
 
 If you are not sure what category you are under, contact us at hello@realtimetrains.com.
-
-We will advise EOL dates for each version of the API when we release the v2 API into production usage.
 
 ## Discussion
 
