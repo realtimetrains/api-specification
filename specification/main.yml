@@ -1134,7 +1134,7 @@ paths:
             The unique identifier of a train service, which includes identity and departure date from origin.
 
             **Required if _identity_ and _departureDate_ not set.**
-          example: gb-nr:L01525:2025-10-26
+          example: L01525:2025-10-26
         - in: query 
           name: identity
           schema:
