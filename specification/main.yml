@@ -513,6 +513,14 @@ components:
             $ref: '#/components/schemas/LocationMetadata'
           location:
             $ref: '#/components/schemas/GeographicLocation'
+          associatedServices:
+            type: array
+            description: |
+              Associated services at this location (e.g. joins, divides, formations).
+
+              Associations that are not advertised to the public (where isPublic is false) are only included when detailed mode is enabled.
+            items:
+              $ref: '#/components/schemas/AssociatedService'
 
     NetworkRailServiceLocations:
       type: array
@@ -525,6 +533,61 @@ components:
             $ref: '#/components/schemas/NetworkRailLocationMetadata'
           location:
             $ref: '#/components/schemas/GeographicLocation'
+          associatedServices:
+            type: array
+            description: |
+              Associated services at this location (e.g. joins, divides, formations).
+
+              Associations that are not advertised to the public (where isPublic is false) are only included when detailed mode is enabled.
+            items:
+              $ref: '#/components/schemas/NetworkRailAssociatedService'
+
+    AssociationType:
+      type: string
+      description: |
+        Describes the type of association between two services at a location
+
+        * JOIN_FROM: this service is joined by this associated service
+        * JOIN_INTO: this service joins the associated service  
+        * DIVIDE_INTO: service divides from this to the associated service
+        * DIVIDE_FROM: this associated service divides to form this service 
+        * FORM_INTO: this service forms this associated service  
+        * FORM_FROM: this service is formed by the associated service 
+
+      enum:
+        - JOIN_FROM
+        - JOIN_INTO
+        - DIVIDE_INTO
+        - DIVIDE_FROM
+        - FORM_INTO
+        - FORM_FROM
+
+    AssociationData:
+      type: object
+      properties:
+        associationType:
+          $ref: '#/components/schemas/AssociationType'
+        isPublic:
+          type: boolean
+          description: Indicates whether this is an advertised association
+
+    AssociatedService:
+      type: object
+      description: An associated service at this location
+      properties:
+        associationData:
+          $ref: '#/components/schemas/AssociationData'
+        scheduleMetadata:
+          $ref: '#/components/schemas/ScheduleMetadata'
+
+    NetworkRailAssociatedService:
+      type: object
+      description: An associated service at this location with Network Rail specific metadata
+      properties:
+        associationData:
+          $ref: '#/components/schemas/AssociationData'
+        scheduleMetadata:
+          $ref: '#/components/schemas/NetworkRailScheduleMetadata'
 
     LocationPair:
       type: object
