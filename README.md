@@ -48,6 +48,19 @@ If you do not send a version request, you will automatically receive the latest 
 
 You can find the version identifier you are currently using on the `version` property in the `/api/info` endpoint.
 
+## Rate Limiting
+
+All API responses include rate limit headers to help you manage your usage. Headers are suffixed with a dimension: `Minute`, `Hour`, `Day` or `Week`.
+
+| Header | Description |
+|---|---|
+| `X-RateLimit-Limit-<dimension>` | Maximum number of requests permitted in the given dimension |
+| `X-RateLimit-Remaining-<dimension>` | Number of requests remaining in the given dimension |
+
+For example, `X-RateLimit-Limit-Hour` and `X-RateLimit-Remaining-Hour`.
+
+If you exceed your rate limit, a `429 Too Many Requests` response will be returned with a `Retry-After` header indicating the number of seconds until you can retry.
+
 ## API Transition
 
 All existing APIs are now deprecated following the release of the new API portal. No further updates will be made to the existing portals or services.

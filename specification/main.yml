@@ -16,7 +16,18 @@ info:
 
     # API Versioning
 
-    You can find the current version of the API you are using through /api/info. The API accepts a Version header. You can guarantee the selection of the API version by using the Version header. You will otherwise always be provided the latest copy. 
+    You can find the current version of the API you are using through /api/info. The API accepts a Version header. You can guarantee the selection of the API version by using the Version header. You will otherwise always be provided the latest copy.
+
+    # Rate Limiting
+
+    All API responses include rate limit headers to help you manage your usage. Headers are suffixed with a dimension: `Minute`, `Hour`, `Day` or `Week`. The following headers are returned:
+
+    * `X-RateLimit-Limit-<dimension>` — the maximum number of requests permitted in the given dimension
+    * `X-RateLimit-Remaining-<dimension>` — the number of requests remaining in the given dimension
+
+    For example, `X-RateLimit-Limit-Hour` and `X-RateLimit-Remaining-Hour`.
+
+    If you exceed your rate limit, a `429 Too Many Requests` response will be returned with a `Retry-After` header indicating the number of seconds until you can retry.
 
   contact:
     email: hello@realtimetrains.com
