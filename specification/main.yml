@@ -721,7 +721,7 @@ paths:
           schema:
             type: string 
             format: date-time
-            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            description: ISO 8601 datetime (e.g. "2025-10-25T13:45:30+01:00" or "2025-10-25T13:45:30"). If no timezone offset is provided, the local timezone of the queried location is assumed. A datetime without any timezone data is permitted.
             example: "2025-10-25T13:45:30Z"
           required: false 
           description: |
@@ -734,7 +734,7 @@ paths:
           schema:
             type: string 
             format: date-time
-            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            description: ISO 8601 datetime (e.g. "2025-10-25T13:45:30+01:00" or "2025-10-25T13:45:30"). If no timezone offset is provided, the local timezone of the queried location is assumed. A datetime without any timezone data is permitted.
             example: "2025-10-25T13:45:30Z"
           required: false 
           description: |
@@ -935,7 +935,7 @@ paths:
           schema:
             type: string 
             format: date-time
-            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            description: ISO 8601 datetime (e.g. "2025-10-25T13:45:30+01:00" or "2025-10-25T13:45:30"). If no timezone offset is provided, the local timezone of the queried location is assumed. A datetime without any timezone data is permitted.
             example: "2025-10-25T13:45:30Z"
           required: false 
           description: |
@@ -948,7 +948,7 @@ paths:
           schema:
             type: string 
             format: date-time
-            description: ISO 8601 / RFC3339 datetime (e.g. "2025-10-25T13:45:30Z"; UTC or with offset allowed)
+            description: ISO 8601 datetime (e.g. "2025-10-25T13:45:30+01:00" or "2025-10-25T13:45:30"). If no timezone offset is provided, the local timezone of the queried location is assumed. A datetime without any timezone data is permitted.
             example: "2025-10-25T13:45:30Z"
           required: false 
           description: |
