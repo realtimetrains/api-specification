@@ -1284,12 +1284,21 @@ paths:
         '401':
           description: Missing required entitlement or TOC access restricted
 
-  /data/locations:
+  /data/locations_ungrouped:
     get:
       tags:
         - referenceData
-      summary: Get a list of locations available in the database
-      description: Gets a full list of locations from the database across all namespaces.
+      summary: Get a list of locations
+      description: |
+        Gets a full list of locations from the database across namespaces available to you.
+
+        This endpoint will return a filtered list of locations in your namespace.
+
+        Note that while the main operation of the system will group similar locations together (e.g. on shortCodes), this endpoint does not do so. Each location item is returned individually. 
+
+        For locations like Clapham Junction (in the gb-nr namespace), 5 locations will appear with the same short code as separate objects.
+
+        Available in API version 2026-04-09 onwards.
       parameters:
         - $ref: '#/components/parameters/VersionHeader'
         - $ref: '#/components/parameters/VersionQuery'
@@ -1304,8 +1313,69 @@ paths:
                   locations:
                     type: array 
                     items:
-                      $ref: "#/components/schemas/GeographicLocation"
+                      type: object 
+                      properties:
+                        namespace:
+                          type: string 
+                          description: Namespace of the location
+                          default: gb-nr 
+                        description:
+                          type: string 
+                          description: Long text description of the location
+                          example: Clapham Junction 
+                        shortCode:
+                          type: string 
+                          example: CLJ 
+                        longCode:
+                          type: string 
+                          example: CLPHMJN
+                        uniqueIdentity:
+                          type:
+                          example: gb-nr:CLPHMJN
   
+  /data/stops:
+    get:
+      tags:
+        - referenceData
+      summary: Get a list of stops
+      description: |
+        Gets a full list of stops from the database across namespaces available to you. We define a stop as any location at which a service may stop (validly) for passenger usage, this may include railway stations, bus stops, tram stops, etc.
+
+        This endpoint will return a filtered list of stops in your namespace.
+      
+        Available in API version 2026-04-09 onwards.      
+      parameters:
+        - $ref: '#/components/parameters/VersionHeader'
+        - $ref: '#/components/parameters/VersionQuery'
+      responses:
+        '200':
+          description: A list of all stops 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array 
+                    items:
+                      type: object 
+                      properties:
+                        namespace:
+                          type: string 
+                          description: Namespace of the location
+                          default: gb-nr 
+                        description:
+                          type: string 
+                          description: Long text description of the location
+                          example: Clapham Junction 
+                        shortCode:
+                          type: string 
+                          example: CLJ 
+                        uniqueIdentity:
+                          type:
+                          example: gb-nr:CLJ
+  
+
   /api/info:
     get:
       tags:
