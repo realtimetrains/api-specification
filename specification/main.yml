@@ -1355,7 +1355,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  locations:
+                  stops:
                     type: array 
                     items:
                       type: object 
