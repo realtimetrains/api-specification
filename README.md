@@ -4,6 +4,8 @@ This repository contains the implemented specification for the next generation o
 
 [You can view a UI view of the specification here.](https://realtimetrains.github.io/api-specification/)
 
+You can find a [changelog here](CHANGELOG.md).
+
 ## Contributing
 
 We welcome contributions, suggestions and change requests to this specification. Please suggest these via issues on the repository.

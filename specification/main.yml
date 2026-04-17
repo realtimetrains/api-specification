@@ -14,6 +14,22 @@ info:
     * solely an access token which grants you a long-life entitlement to the system or,
     * long-life refresh token which you will need to request a short-life access token with.
 
+    API authentication is performed through a *Bearer* token authentication. You may either hold a long-life refresh or access token. When you are provided with the key, it will be made clear what you hold.
+
+    **It is a requirement that no token is placed in a distributable user application unless specifically authorised by us.** End-user applications are expected to proxy their requests through a server-side application such that token is not available publicly. If we identify a token is in a downstream user application, it **will** be revoked.
+
+    If you have a refresh token, you will need to periodically request an access token. You can do this through the `/api/get_access_token` endpoint. This will issue you an access token that is valid until the time defined in `validUntil`. It will also tell you your entitlements.
+
+    ### Understanding your entitlements
+    
+    An access token does not grant access to all functionality of the API. Entitlements can restrict access to namespaces and/or functionality, such as access to detailed information or Know Your Train data.
+
+    When you have a valid access token, your entitlements can be found through the `/api/info` endpoint. 
+
+    ### Getting an access token
+
+    You can sign up to the next-generation API at https://api-portal.rtt.io. It requires a RTT unified login account.
+
     # API Versioning
 
     You can find the current version of the API you are using through /api/info. The API accepts a Version header. You can guarantee the selection of the API version by using the Version header. You will otherwise always be provided the latest copy.
@@ -168,19 +184,21 @@ components:
       description: | 
         Defines the display type for this location. The defined are as follows:
 
-        * **CALL**: train stops at location, specific nature defined in other fields 
+        * **CALL**: train stops at location, specific nature defined in other fields. Includes scheduled origin & destination if unaltered. 
         * **CANCELLED**: train no longer stops at/passes this location, if it was previously a call it is undefined whether the train will no longer pass through (i.e. whether it is a Not to Stop order, or the train has been altered in such a way that it will not go through this location.) 
         * **DIVERTED**: train has been diverted away from this route and will no longer pass through or call at this location.
-        * **STARTS**: train starts from this location (scheduled or altered to do so.)
-        * **TERMINATES**: train terminates at this location (scheduled or altered to do so.)
+        * **STARTS**: train now starts from this location (altered to do so.)
+        * **TERMINATES**: train now terminates at this location (altered to do so.)
+        * **PASS**: train passes this location 
 
-        If this field is null, then the train is passing this location.
+        If this field is null, then this should be considered as a PASS.
       enum:
         - CALL 
         - CANCELLED
         - DIVERTED
         - STARTS 
         - TERMINATES
+        - PASS 
 
     LocationStatus:
       oneOf:
@@ -222,7 +240,9 @@ components:
           description: | 
             If populated, shows an estimated time for this activity if the service has otherwise not reported at this location.
 
-            This field is conditional based on entitlements. 
+            This is different to the `realtimeForecast` field, in that it will only be populated if the train has no reported at this location. 
+
+            This field will only be populated if you have the correct entitlement on your token.
         realtimeNoReport:
           type: boolean
           description: If populated true, this service has not reported at this activity.
