@@ -2,6 +2,11 @@
 
 This file covers changes to the API as well as the specification. The oldest changes are listed at the bottom. All versions prior to 2026-04-17 are not detailed.
 
+## 2026-04-23
+* Changes to the operator.name field to indicate that this should **not** be cached under any circumstances by keying against the code. We may change this field dynamically based on other data to reflect operator branding, rather than name.
+
+Note: in a future change, we will likely revert this such that operator.name becomes the true operator name again, but add a brand key that should be used.
+
 ## 2026-04-22
 * The authentication evaluators will now return an indication if they detect a token identity rather than the token itself
 * Update backend handling of Know Your Train Data

@@ -383,6 +383,10 @@ components:
             name:
               type: string
               example: South Western Railway
+              description: |
+                The full length name of this train operator.
+
+                **IMPORTANT**: you should not cache this field based on the operator code, particularly in the gb-nr namespace. For some train operators, we may change this field to reflect an operating brand rather than the true operator name. 
         modeType:
           type: string
           description: Describes the form of transport that is being operated on this service. Note that BUS is deprecated and will soon be removed; and is only in place until we can make some technical changes.
