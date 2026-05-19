@@ -2,6 +2,9 @@
 
 This file covers changes to the API as well as the specification. The oldest changes are listed at the bottom. All versions prior to 2026-04-17 are not detailed.
 
+## 2026-05-19
+This release provides internal updates for our own functionality demands and provides no fixes or additional endpoints relevant for public use.
+
 ## 2026-04-30
 * Fix issue with /data/locations_ungrouped where locations that were marked as associated internally were not being provided
 
