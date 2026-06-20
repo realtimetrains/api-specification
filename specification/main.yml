@@ -948,6 +948,17 @@ paths:
             The identity of the service being queried.
 
             **Required if _uniqueIdentity_ not set.**
+        - in: query
+          name: detailed
+          schema:
+            type: boolean
+            default: false
+          example: false
+          required: false
+          description: |
+            If set to true, enables detailed mode when available in the namespace. Will also enable internal times to be displayed.
+
+            This functionality may be limited by your authorisation token.
       responses:
         '200':
           description: Returns the data for a service
@@ -961,13 +972,13 @@ paths:
                   query:
                     type: object
                     properties:
-                      uniqueIdentity: 
-                        type: string 
+                      uniqueIdentity:
+                        type: string
                         description: |
                           The unique identifier of a train service, which includes namespace, identity and departure date from origin.
                         example: gb-nr:L01525:2025-10-26
                   service:
-                    type: object 
+                    type: object
                     properties:
                       scheduleMetadata:
                         $ref: '#/components/schemas/ScheduleMetadata'
@@ -1180,6 +1191,17 @@ paths:
             The identity of the service being queried.
 
             **Required if _uniqueIdentity_ not set.**
+        - in: query
+          name: detailed
+          schema:
+            type: boolean
+            default: false
+          example: false
+          required: false
+          description: |
+            If set to true, enables detailed mode when available in the namespace. Will also enable internal times to be displayed.
+
+            This functionality may be limited by your authorisation token.
       responses:
         '200':
           description: Returns the data for a service
@@ -1193,13 +1215,13 @@ paths:
                   query:
                     type: object
                     properties:
-                      uniqueIdentity: 
-                        type: string 
+                      uniqueIdentity:
+                        type: string
                         description: |
                           The unique identifier of a train service, which includes namespace, identity and departure date from origin.
                         example: gb-nr:L01525:2025-10-26
                   service:
-                    type: object 
+                    type: object
                     properties:
                       scheduleMetadata:
                         $ref: '#/components/schemas/NetworkRailScheduleMetadata'
@@ -1225,6 +1247,93 @@ paths:
           description: Service cannot be found
 
   /gb-nr/allocations_by_service:
+    get:
+      tags:
+        - network-rail
+      deprecated: true
+      summary: Allocation listing by service for a given TOC and date
+      description: |
+        Returns rolling stock allocation data listed by service for a given TOC and departure date.
+
+        Requires the `allowFullAllocationListing` entitlement. Access may be further restricted by TOC.
+
+        **Deprecated:** use `/gb-nr/allocations/by-service` instead.
+      parameters:
+        - $ref: '#/components/parameters/VersionHeader'
+        - $ref: '#/components/parameters/VersionQuery'
+        - in: query
+          name: departureDate
+          schema:
+            type: string
+            format: date
+          required: true
+          description: Scheduled date of departure from origin
+          example: "2025-10-26"
+        - in: query
+          name: toc
+          schema:
+            type: string
+          required: true
+          description: Requested TOC filter
+          example: SW
+      responses:
+        '200':
+          description: Valid query, allocations found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object
+                    properties:
+                      departureDate:
+                        type: string
+                        format: date
+                        example: "2025-10-26"
+                      toc:
+                        type: string
+                        example: SW
+                  services:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduleMetadata:
+                          $ref: '#/components/schemas/NetworkRailScheduleMetadata'
+                        origin:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LocationPair'
+                        destination:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LocationPair'
+                        allocations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              attached:
+                                $ref: '#/components/schemas/LocationPair'
+                              detached:
+                                $ref: '#/components/schemas/LocationPair'
+                              allocationIndex:
+                                type: integer
+                                description: Index of this allocation, starting from 0
+                                example: 0
+                              allocationItems:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/NetworkRailAllocationItem'
+        '400':
+          description: Invalid query
+        '401':
+          description: Missing required entitlement or TOC access restricted
+
+  /gb-nr/allocations/by-service:
     get:
       tags:
         - network-rail
@@ -1303,6 +1412,74 @@ paths:
                                 type: array
                                 items:
                                   $ref: '#/components/schemas/NetworkRailAllocationItem'
+        '400':
+          description: Invalid query
+        '401':
+          description: Missing required entitlement or TOC access restricted
+
+  /gb-nr/allocations/by-class:
+    get:
+      tags:
+        - network-rail
+      summary: Allocation listing by class member for a given class and date
+      description: |
+        Returns rolling stock allocation data listed by class member (identity) for a given class and departure date.
+
+        Requires the `allowFullAllocationListing` entitlement. Access may be further restricted by TOC.
+      parameters:
+        - $ref: '#/components/parameters/VersionHeader'
+        - $ref: '#/components/parameters/VersionQuery'
+        - in: query
+          name: departureDate
+          schema:
+            type: string
+            format: date
+          required: true
+          description: Scheduled date of departure from origin
+          example: "2025-10-26"
+        - in: query
+          name: class
+          schema:
+            type: string
+          required: true
+          description: Requested rolling stock class filter
+          example: "444"
+      responses:
+        '200':
+          description: Valid query, allocations found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  systemStatus:
+                    $ref: '#/components/schemas/SystemStatus'
+                  query:
+                    type: object
+                    properties:
+                      departureDate:
+                        type: string
+                        format: date
+                        example: "2025-10-26"
+                      class:
+                        type: string
+                        example: "444"
+                  identities:
+                    type: object
+                    description: |
+                      Dictionary of allocations keyed by class member (identity). Each key is a unit number
+                      (e.g. `444001`) mapping to the list of allocations for that unit on the requested date.
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          attached:
+                            $ref: '#/components/schemas/LocationPair'
+                          detached:
+                            $ref: '#/components/schemas/LocationPair'
+                          service:
+                            $ref: '#/components/schemas/NetworkRailScheduleMetadata'
         '400':
           description: Invalid query
         '401':
