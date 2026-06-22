@@ -2,6 +2,9 @@
 
 This file covers changes to the API as well as the specification. The oldest changes are listed at the bottom. All versions prior to 2026-04-17 are not detailed.
 
+## 2026-06-22
+This release provides internal updates for our own functionality demands and provides no fixes or additional endpoints relevant for public use.
+
 ## 2026-06-20
 This release *deprecates* the `/gb-nr/allocations_by_service` endpoint, and replaces it with a new `/gb-nr/allocations/by-service`. Entitlement requirements for this endpoint are unchanged.
 
