@@ -2,6 +2,10 @@
 
 This file covers changes to the API as well as the specification. The oldest changes are listed at the bottom. All versions prior to 2026-04-17 are not detailed.
 
+## 2026-07-25
+
+Additional entitlements `allowAllocationsPassenger` and `allowFullAllocationListingPassenger` added in preparation for paid API plan release. Documentation added around entitlements. 
+
 ## 2026-06-22
 This release provides internal updates for our own functionality demands and provides no fixes or additional endpoints relevant for public use.
 

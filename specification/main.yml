@@ -45,6 +45,23 @@ info:
 
     If you exceed your rate limit, a `429 Too Many Requests` response will be returned with a `Retry-After` header indicating the number of seconds until you can retry.
 
+    # Available Entitlements
+
+    The below section includes a list of most available entitlements within the API. Not all entitlements are available to all users. Some entitlements are retained for RTT use only and are not detailed here. 
+
+    * `allowDetailed` - enables detailed mode
+    * `allowAllocations` - allows access to all allocations on train service and location line up searches
+    * `allowAllocationsPassenger` - as above, except restricted to train operators only available via Gemini
+    * `allowAllocationComponents` - includes individual vehicle components of allocation data such as vehicle numbers 
+    * `allowFullAllocationListing` - entitles access to the allocations by service/class endpoints. This may be restricted by train operator.
+    * `allowFullAllocationListingPassenger` - as above, except restricted to train operators only available via Gemini 
+    * `allowFreightAllocations` - requires allowAllocations, additionally provides allocations for freight trains 
+    * `allowFreightAllocationComponents` - like `allowAllocationComponents`, provides individual vehicle data. 
+    * `showEstimateTimeIfNoReport` - feature flag, RTT will compute an estimated time in 'No report' scenarios where possible and train still considered en-route.
+
+    Some entitlements, particularly allocations if not open data, require consent from the train operator with which data is being required.
+
+
   contact:
     email: hello@realtimetrains.com
     url: http://www.realtimetrains.co.uk
@@ -1341,7 +1358,7 @@ paths:
       description: |
         Returns rolling stock allocation data listed by service for a given TOC and departure date.
 
-        Requires the `allowFullAllocationListing` entitlement. Access may be further restricted by TOC.
+        Requires the `allowFullAllocationListing` or `allowFullAllocationListingPassenger` entitlements. Access may be further restricted by TOC.
       parameters:
         - $ref: '#/components/parameters/VersionHeader'
         - $ref: '#/components/parameters/VersionQuery'
@@ -1425,7 +1442,7 @@ paths:
       description: |
         Returns rolling stock allocation data listed by class member (identity) for a given class and departure date.
 
-        Requires the `allowFullAllocationListing` entitlement. Access may be further restricted by TOC.
+        Requires the `allowFullAllocationListing` or `allowFullAllocationListingPassenger` entitlements. Access may be further restricted by TOC.
       parameters:
         - $ref: '#/components/parameters/VersionHeader'
         - $ref: '#/components/parameters/VersionQuery'
