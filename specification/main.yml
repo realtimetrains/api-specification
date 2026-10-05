@@ -79,12 +79,12 @@ servers:
 tags:
   - name: generic
     description: |
-      Is the primary entry point for generic outputs relating to service data, including forward looking schedule and historical outputs. 
+      Is the primary entry point for generic outputs relating to less detailed service data, including forward looking schedule and historical outputs. 
 
       Endpoints and outputs may be restricted by authorisation token.
   - name: network-rail
     description: |
-      Network Rail specific endpoints for service data. 
+      Network Rail specific endpoints for more detailed service data. 
 
       Endpoints and outputs may be restricted by authorisation token.
   - name: referenceData
